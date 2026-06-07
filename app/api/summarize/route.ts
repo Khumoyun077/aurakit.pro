@@ -1,26 +1,25 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const apiKey = process.env.OPENAI_API_KEY
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function POST(req: Request) {
   try {
-    const { text, lang } = await req.json();
+    const { text, language } = await req.json();
 
     if (!text) {
       return NextResponse.json({ error: 'Matn kiritilmadi' }, { status: 400 });
     }
 
-    // Har bir til uchun GPT'ga qanday konspekt qilish bo'yicha ko'rsatma beramiz
-    let systemPrompt = "Siz matnning eng muhim joylarini ajratib beruvchi yordamchisiz. Berilgan matnni tahlil qiling va eng asosiy mag'zini, muhim tezislarini o'zbek tilida, qisqa va tushunarli punktlar (bullet points) ko'rinishida chiqarib bering.";
-    
-    if (lang === 'RU') {
-      systemPrompt = "Вы помощник, который выделяет главное из текста. Проанализируйте текст и выделите основную суть и важные тезисы на русском языке, в виде кратких и понятных пунктов (bullet points).";
-    } else if (lang === 'EN') {
-      systemPrompt = "You are an assistant that extracts the core insights from text. Analyze the text and summarize the main essence and key points in English, using short and clear bullet points.";
+    // ✅ 'lang' o'rniga 'language' — page.tsx bilan mos
+    let systemPrompt = "Berilgan matnni tahlil qiling va eng asosiy mag'zini o'zbek tilida, qisqa bullet points ko'rinishida chiqarib bering.";
+
+    if (language === 'RU') {
+      systemPrompt = "Проанализируйте текст и выделите основную суть на русском языке, в виде кратких bullet points.";
+    } else if (language === 'EN') {
+      systemPrompt = "Analyze the text and summarize the key points in English, using short bullet points.";
     }
 
     const response = await openai.chat.completions.create({
@@ -32,10 +31,9 @@ export async function POST(req: Request) {
       temperature: 0.5,
     });
 
-    return NextResponse.json({ summary: response.choices[0].message.content });
+    return NextResponse.json({ result: response.choices[0].message.content });
 
   } catch (error: any) {
-    console.error('Summarize xatolik:', error);
-    return NextResponse.json({ error: error.message || 'Konspekt qilishda xatolik' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Xatolik' }, { status: 500 });
   }
 }
