@@ -5,68 +5,40 @@ const mainTranslations = {
   UZ: {
     title: 'AuraKit.pro — Hammasi 1 ta bosishda!',
     subtitle: 'Odamlar va xalq uchun eng oson sun\'iy intellekt yordamchisi',
-    card1_title: '🎙️ Ovozni matnga aylantirish',
-    card2_title: '📄 Mag\'zini chiqarish',
-    card3_title: '🌐 Tarjima qilish',
-    card4_title: '💼 Professional CV tayyorlash',
-    card4_btn: 'CV yaratish',
-    placeholder_name: 'Ismingiz',
-    placeholder_exp: 'Ish tajribangiz',
-    placeholder_skills: 'Ko\'nikmalaringiz (Skills)'
+    card1_title: 'Ovozni matnga aylantirish',
+    card2_title: 'Mag\'zini chiqarish',
+    card3_title: 'Tarjima qilish',
+    card4_title: 'Professional CV tayyorlash',
+    name: 'Ismingiz', exp: 'Tajriba', skills: 'Ko\'nikmalar', create: 'CV yaratish'
   },
   RU: {
     title: 'AuraKit.pro — Всё в 1 клик!',
     subtitle: 'Самый простой помощник на базе ИИ для людей',
-    card1_title: '🎙️ Преобразование голоса в текст',
-    card2_title: '📄 Выделение главного (Конспект)',
-    card3_title: '🌐 Переводчик',
-    card4_title: '💼 Создание профессионального CV',
-    card4_btn: 'Создать CV',
-    placeholder_name: 'Ваше имя',
-    placeholder_exp: 'Ваш опыт работы',
-    placeholder_skills: 'Ваши навыки (Skills)'
+    card1_title: 'Преобразование голоса в текст',
+    card2_title: 'Выделение главного (Конспект)',
+    card3_title: 'Переводчик',
+    card4_title: 'Создание профессионального CV',
+    name: 'Ваше имя', exp: 'Опыт работы', skills: 'Ваши навыки', create: 'Создать CV'
   },
   EN: {
     title: 'AuraKit.pro — All in 1 Click!',
     subtitle: 'The easiest AI assistant for everyone',
-    card1_title: '🎙️ Speech to Text (Transcribe)',
-    card2_title: '📄 Text Summarization',
-    card3_title: '🌐 Translation Service',
-    card4_title: '💼 Professional CV Builder',
-    card4_btn: 'Create CV',
-    placeholder_name: 'Your Name',
-    placeholder_exp: 'Your Work Experience',
-    placeholder_skills: 'Your Skills'
+    card1_title: 'Speech to Text (Transcribe)',
+    card2_title: 'Text Summarization',
+    card3_title: 'Translation Service',
+    card4_title: 'Professional CV Builder',
+    name: 'Your Name', exp: 'Your Experience', skills: 'Your Skills', create: 'Create CV'
   }
 };
 
 export default function HomePage() {
   const [currentLang, setCurrentLang] = useState<'UZ' | 'RU' | 'EN'>('UZ');
-  const [data, setData] = useState({ name: '', experience: '', skills: '' });
-  const [cvResult, setCvResult] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [showCV, setShowCV] = useState(false);
 
   useEffect(() => {
     const savedLang = localStorage.getItem('selectedLanguage') as 'UZ' | 'RU' | 'EN';
     if (savedLang) setCurrentLang(savedLang);
   }, []);
-
-  const changeLanguage = (lang: 'UZ' | 'RU' | 'EN') => {
-    setCurrentLang(lang);
-    localStorage.setItem('selectedLanguage', lang);
-  };
-
-  const handleCreateCV = async () => {
-    setLoading(true);
-    const response = await fetch('/api/cv', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...data, language: currentLang }),
-    });
-    const result = await response.json();
-    setCvResult(result.cv);
-    setLoading(false);
-  };
 
   const t = mainTranslations[currentLang];
 
@@ -75,7 +47,8 @@ export default function HomePage() {
       {/* Til tanlash tugmalari */}
       <div className="absolute top-6 right-6 flex bg-slate-800 p-1 rounded-xl border border-slate-700/50 z-10">
         {(['UZ', 'RU', 'EN'] as const).map((lang) => (
-          <button key={lang} onClick={() => changeLanguage(lang)} className={`px-3 py-1.5 rounded-lg ${currentLang === lang ? 'bg-indigo-600' : 'text-slate-400'}`}>
+          <button key={lang} onClick={() => { setCurrentLang(lang); localStorage.setItem('selectedLanguage', lang); }} 
+            className={`px-3 py-1.5 rounded-lg ${currentLang === lang ? 'bg-indigo-600' : 'text-slate-400'}`}>
             {lang}
           </button>
         ))}
@@ -86,25 +59,31 @@ export default function HomePage() {
         <p className="text-slate-400">{t.subtitle}</p>
       </div>
 
-      {/* CV Builder qismi */}
-      <div className="w-full max-w-2xl bg-slate-800/50 p-6 rounded-2xl border border-slate-700 mb-12">
-        <h3 className="text-xl font-bold mb-4">{t.card4_title}</h3>
-        <input className="w-full p-3 mb-3 bg-slate-900 rounded border border-slate-700" placeholder={t.placeholder_name} onChange={(e) => setData({...data, name: e.target.value})} />
-        <textarea className="w-full p-3 mb-3 bg-slate-900 rounded border border-slate-700" placeholder={t.placeholder_exp} onChange={(e) => setData({...data, experience: e.target.value})} />
-        <textarea className="w-full p-3 mb-4 bg-slate-900 rounded border border-slate-700" placeholder={t.placeholder_skills} onChange={(e) => setData({...data, skills: e.target.value})} />
-        <button onClick={handleCreateCV} className="w-full bg-amber-600 py-3 rounded-xl font-bold hover:bg-amber-500 transition">
-          {loading ? '...' : t.card4_btn}
-        </button>
-        {cvResult && <div className="mt-6 p-4 bg-white text-black rounded whitespace-pre-line">{cvResult}</div>}
-      </div>
+      <div className="w-full max-w-4xl flex flex-col gap-6">
+        {/* CV Formasi (Agar ochilsa, eng tepada turadi) */}
+        {showCV && (
+          <div className="bg-slate-800/50 border border-amber-500 p-8 rounded-2xl">
+            <h3 className="text-xl font-bold mb-4">{t.card4_title}</h3>
+            <input className="w-full p-3 mb-3 bg-slate-900 rounded border border-slate-700" placeholder={t.name} />
+            <textarea className="w-full p-3 mb-3 bg-slate-900 rounded border border-slate-700" placeholder={t.exp} />
+            <textarea className="w-full p-3 mb-4 bg-slate-900 rounded border border-slate-700" placeholder={t.skills} />
+            <button className="w-full bg-amber-600 py-3 rounded-xl font-bold">{t.create}</button>
+            <button onClick={() => setShowCV(false)} className="mt-4 text-slate-400 underline w-full text-center">Orqaga</button>
+          </div>
+        )}
 
-      {/* Boshqa funksiyalar */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
-        <div className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl">{t.card1_title}</div>
-        <div className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl">{t.card2_title}</div>
-        <div className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl">{t.card3_title}</div>
+        {/* 2x2 Grid (Forma ochilsa ham, pastda qoladi) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl h-32 flex items-center">🎙️ {t.card1_title}</div>
+          <div className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl h-32 flex items-center">📄 {t.card2_title}</div>
+          <div className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl h-32 flex items-center">🌐 {t.card3_title}</div>
+          <button onClick={() => setShowCV(true)} className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl h-32 text-left hover:border-amber-500 flex items-center">
+            💼 {t.card4_title}
+          </button>
+        </div>
       </div>
     </main>
   );
 }
+
 
