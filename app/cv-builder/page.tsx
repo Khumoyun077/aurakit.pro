@@ -1,87 +1,55 @@
 'use client';
 import { useState } from 'react';
 
-export default function CVBuilder() {
+// Til matnlari (bosh sahifa bilan bir xil uslubda)
+const translations = {
+  UZ: { title: 'Professional CV tayyorlash', name: 'Ismingiz', exp: 'Ish tajribangiz', skills: 'Ko\'nikmalar', btn: 'CV yaratish' },
+  RU: { title: 'Создание профессионального CV', name: 'Ваше имя', exp: 'Ваш опыт работы', skills: 'Ваши навыки', btn: 'Создать CV' },
+  EN: { title: 'Professional CV Builder', name: 'Your Name', exp: 'Work Experience', skills: 'Skills', btn: 'Create CV' }
+};
+
+export default function CVBuilderPage() {
+  const [lang, setLang] = useState<'UZ' | 'RU' | 'EN'>('EN');
   const [data, setData] = useState({ name: '', experience: '', skills: '' });
   const [cv, setCv] = useState('');
   const [loading, setLoading] = useState(false);
-  const [currentLang, setCurrentLang] = useState<'UZ' | 'RU' | 'EN'>('UZ'); // Til state qo'shildi
+
+  const t = translations[lang];
 
   const handleSubmit = async () => {
-    if (!data.name || !data.experience || !data.skills) {
-      alert("Iltimos, barcha maydonlarni to'ldiring!");
-      return;
-    }
-
     setLoading(true);
-    try {
-      const res = await fetch('/api/cv', { // Manzil to'g'irlandi
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, language: currentLang }), // Til qo'shildi
-      });
-      
-      const result = await res.json();
-      if (result.cv) {
-        setCv(result.cv);
-      } else {
-        alert("Xatolik yuz berdi: " + result.error);
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Server bilan bog'lanishda xatolik.");
-    } finally {
-      setLoading(false);
-    }
+    const res = await fetch('/api/cv', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...data, language: lang }),
+    });
+    const result = await res.json();
+    setCv(result.cv);
+    setLoading(false);
   };
 
   return (
-    <div className="p-10 max-w-2xl mx-auto bg-slate-900 text-white min-h-screen">
-      <h1 className="text-3xl font-bold mb-6">Professional CV Builder</h1>
-
-      {/* Til tanlash tugmalari */}
-      <div className="flex gap-2 mb-6">
-        {(['UZ', 'RU', 'EN'] as const).map((lang) => (
-          <button 
-            key={lang} 
-            onClick={() => setCurrentLang(lang)} 
-            className={`px-4 py-2 rounded font-bold ${currentLang === lang ? 'bg-indigo-600' : 'bg-slate-700'}`}
-          >
-            {lang}
-          </button>
+    <main className="min-h-screen bg-slate-900 text-white flex flex-col items-center p-6">
+      {/* Til tanlash tugmalari (dizaynga mos) */}
+      <div className="absolute top-6 right-6 flex bg-slate-800 p-1 rounded-xl border border-slate-700/50">
+        {(['UZ', 'RU', 'EN'] as const).map(l => (
+          <button key={l} onClick={() => setLang(l)} className={`px-3 py-1.5 rounded-lg ${lang === l ? 'bg-indigo-600' : 'text-slate-400'}`}>{l}</button>
         ))}
       </div>
-      
-      <input 
-        className="w-full p-3 mb-4 border border-slate-700 bg-slate-800 rounded text-white" 
-        placeholder="Ismingiz" 
-        onChange={(e) => setData({...data, name: e.target.value})} 
-      />
-      <textarea 
-        className="w-full p-3 mb-4 border border-slate-700 bg-slate-800 rounded text-white h-32" 
-        placeholder="Ish tajribangiz" 
-        onChange={(e) => setData({...data, experience: e.target.value})} 
-      />
-      <textarea 
-        className="w-full p-3 mb-4 border border-slate-700 bg-slate-800 rounded text-white h-32" 
-        placeholder="Ko'nikmalaringiz (Skills)" 
-        onChange={(e) => setData({...data, skills: e.target.value})} 
-      />
-      
-      <button 
-        onClick={handleSubmit} 
-        disabled={loading}
-        className="bg-purple-600 text-white px-6 py-3 rounded font-bold hover:bg-purple-700 disabled:opacity-50"
-      >
-        {loading ? 'CV yaratilmoqda...' : 'CV yaratish'}
-      </button>
 
-      {cv && (
-        <div className="mt-8 p-6 bg-slate-800 border border-slate-700 rounded whitespace-pre-line text-slate-300">
-          <h2 className="text-xl font-bold mb-4 text-white">Sizning CV-ingiz:</h2>
-          {cv}
-        </div>
-      )}
-    </div>
+      <div className="w-full max-w-2xl mt-16 bg-slate-800/50 border border-slate-700/50 rounded-2xl p-8">
+        <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">{t.title}</h1>
+        
+        <input className="w-full p-4 mb-4 bg-slate-900 rounded-xl border border-slate-700" placeholder={t.name} onChange={(e) => setData({...data, name: e.target.value})} />
+        <textarea className="w-full p-4 mb-4 bg-slate-900 rounded-xl border border-slate-700 h-32" placeholder={t.exp} onChange={(e) => setData({...data, experience: e.target.value})} />
+        <textarea className="w-full p-4 mb-6 bg-slate-900 rounded-xl border border-slate-700 h-32" placeholder={t.skills} onChange={(e) => setData({...data, skills: e.target.value})} />
+        
+        <button onClick={handleSubmit} className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 py-4 rounded-xl font-bold hover:opacity-90 transition">
+          {loading ? '...' : t.btn}
+        </button>
+
+        {cv && <div className="mt-8 p-6 bg-slate-900 rounded-2xl border border-indigo-500/30 whitespace-pre-line">{cv}</div>}
+      </div>
+    </main>
   );
 }

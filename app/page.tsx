@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 
 const mainTranslations = {
-  UZ: {
+UZ: {
     title: 'AuraKit.pro — Hammasi 1 ta bosishda!',
     subtitle: 'Odamlar va xalq uchun eng oson sun\'iy intellekt yordamchisi',
     card1_title: 'Ovozni matnga aylantirish',
@@ -12,7 +12,12 @@ const mainTranslations = {
     card3_title: 'Tarjima qilish',
     card3_btn: 'Boshlash →',
     card4_title: 'Professional CV tayyorlash',
-    card4_btn: 'CV yaratish'
+    card4_btn: 'Boshlash →',
+    // CV Builder uchun yangi qatorlar:
+    placeholder_name: 'Ismingiz',
+    placeholder_exp: 'Ish tajribangiz',
+    placeholder_skills: 'Ko\'nikmalaringiz (Skills)',
+    btn_create: 'CV yaratish'
   },
   RU: {
     title: 'AuraKit.pro — Всё в 1 клик!',
@@ -24,7 +29,12 @@ const mainTranslations = {
     card3_title: 'Переводчик',
     card3_btn: 'Начать →',
     card4_title: 'Создание профессионального CV',
-    card4_btn: 'Создать CV'
+    card4_btn: 'Начать →',
+    // CV Builder uchun yangi qatorlar:
+    placeholder_name: 'Ваше имя',
+    placeholder_exp: 'Ваш опыт работы',
+    placeholder_skills: 'Ваши навыки (Skills)',
+    btn_create: 'Создать CV'
   },
   EN: {
     title: 'AuraKit.pro — All in 1 Click!',
@@ -36,7 +46,12 @@ const mainTranslations = {
     card3_title: 'Translation Service',
     card3_btn: 'Get Started →',
     card4_title: 'Professional CV Builder',
-    card4_btn: 'Create CV'
+    card4_btn: 'Get Started →',
+    // CV Builder uchun yangi qatorlar:
+    placeholder_name: 'Your Name',
+    placeholder_exp: 'Your Work Experience',
+    placeholder_skills: 'Your Skills',
+    btn_create: 'Create CV'
   }
 };
 
