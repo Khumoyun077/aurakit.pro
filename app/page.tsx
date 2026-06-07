@@ -48,7 +48,7 @@ export default function HomePage() {
 
   useEffect(() => {
     const savedLang = localStorage.getItem('selectedLanguage') as 'UZ' | 'RU' | 'EN';
-    if (savedLang && ['UZ', 'RU', 'EN'].includes(savedLang)) setCurrentLang(savedLang);
+    if (savedLang) setCurrentLang(savedLang);
   }, []);
 
   const changeLanguage = (lang: 'UZ' | 'RU' | 'EN') => {
@@ -72,6 +72,7 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen bg-slate-900 text-white flex flex-col items-center p-6">
+      {/* Til tanlash tugmalari */}
       <div className="absolute top-6 right-6 flex bg-slate-800 p-1 rounded-xl border border-slate-700/50 z-10">
         {(['UZ', 'RU', 'EN'] as const).map((lang) => (
           <button key={lang} onClick={() => changeLanguage(lang)} className={`px-3 py-1.5 rounded-lg ${currentLang === lang ? 'bg-indigo-600' : 'text-slate-400'}`}>
@@ -85,6 +86,7 @@ export default function HomePage() {
         <p className="text-slate-400">{t.subtitle}</p>
       </div>
 
+      {/* CV Builder qismi */}
       <div className="w-full max-w-2xl bg-slate-800/50 p-6 rounded-2xl border border-slate-700 mb-12">
         <h3 className="text-xl font-bold mb-4">{t.card4_title}</h3>
         <input className="w-full p-3 mb-3 bg-slate-900 rounded border border-slate-700" placeholder={t.placeholder_name} onChange={(e) => setData({...data, name: e.target.value})} />
@@ -96,10 +98,11 @@ export default function HomePage() {
         {cvResult && <div className="mt-6 p-4 bg-white text-black rounded whitespace-pre-line">{cvResult}</div>}
       </div>
 
+      {/* Boshqa funksiyalar */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
-        <a href="/transcribe" className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl hover:border-indigo-500">{t.card1_title}</a>
-        <a href="/summarize" className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl hover:border-purple-500">{t.card2_title}</a>
-        <a href="/translate" className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl hover:border-emerald-500">{t.card3_title}</a>
+        <div className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl">{t.card1_title}</div>
+        <div className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl">{t.card2_title}</div>
+        <div className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl">{t.card3_title}</div>
       </div>
     </main>
   );
