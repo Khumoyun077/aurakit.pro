@@ -28,26 +28,24 @@ export default function CVBuilderPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-900 text-white flex flex-col items-center p-6">
-      <div className="absolute top-6 right-6 flex bg-slate-800 p-1 rounded-xl border border-slate-700/50">
+    <main className="min-h-screen bg-slate-900 text-white p-10 flex flex-col items-center">
+      {/* Til tanlash (Rasmda ko'rganingizdek yuqorida) */}
+      <div className="absolute top-6 right-6 flex bg-slate-800 p-1 rounded-xl">
         {(['UZ', 'RU', 'EN'] as const).map(l => (
-          <button key={l} onClick={() => setLang(l)} className={`px-3 py-1.5 rounded-lg ${lang === l ? 'bg-indigo-600' : 'text-slate-400'}`}>{l}</button>
+          <button key={l} onClick={() => setLang(l)} className={`px-4 py-1 rounded-lg ${lang === l ? 'bg-indigo-600' : ''}`}>{l}</button>
         ))}
       </div>
 
-      <div className="w-full max-w-2xl mt-16 bg-slate-800/50 border border-slate-700/50 rounded-2xl p-8">
-        <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">{t.title}</h1>
-        
-        {/* Mana bu yerda t.name, t.exp, t.skills ishlatilgan */}
-        <input className="w-full p-4 mb-4 bg-slate-900 rounded-xl border border-slate-700" placeholder={t.name} onChange={(e) => setData({...data, name: e.target.value})} />
-        <textarea className="w-full p-4 mb-4 bg-slate-900 rounded-xl border border-slate-700 h-32" placeholder={t.exp} onChange={(e) => setData({...data, experience: e.target.value})} />
-        <textarea className="w-full p-4 mb-6 bg-slate-900 rounded-xl border border-slate-700 h-32" placeholder={t.skills} onChange={(e) => setData({...data, skills: e.target.value})} />
-        
-        <button onClick={handleSubmit} className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 py-4 rounded-xl font-bold hover:opacity-90 transition">
-          {loading ? '...' : t.btn}
-        </button>
-
-        {cv && <div className="mt-8 p-6 bg-slate-900 rounded-2xl border border-indigo-500/30 whitespace-pre-line">{cv}</div>}
+      {/* Rasmda ko'rsatgan 2x2 dizayn qismi */}
+      <div className="grid grid-cols-2 gap-6 w-full max-w-4xl mt-16">
+        <div className="col-span-2 bg-slate-800 p-8 rounded-2xl border border-slate-700">
+           <h1 className="text-2xl font-bold mb-6">{t.title}</h1>
+           <input className="w-full p-4 mb-4 bg-slate-950 rounded-xl border border-slate-700" placeholder={t.name} onChange={(e) => setData({...data, name: e.target.value})} />
+           <textarea className="w-full p-4 mb-4 bg-slate-950 rounded-xl border border-slate-700 h-24" placeholder={t.exp} onChange={(e) => setData({...data, experience: e.target.value})} />
+           <textarea className="w-full p-4 mb-6 bg-slate-950 rounded-xl border border-slate-700 h-24" placeholder={t.skills} onChange={(e) => setData({...data, skills: e.target.value})} />
+           <button onClick={handleSubmit} className="w-full bg-indigo-600 py-4 rounded-xl font-bold">{loading ? '...' : t.btn}</button>
+           {cv && <div className="mt-8 p-6 bg-slate-950 rounded-xl border border-indigo-500 whitespace-pre-line">{cv}</div>}
+        </div>
       </div>
     </main>
   );
