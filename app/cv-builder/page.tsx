@@ -5,6 +5,7 @@ export default function CVBuilder() {
   const [data, setData] = useState({ name: '', experience: '', skills: '' });
   const [cv, setCv] = useState('');
   const [loading, setLoading] = useState(false);
+  const [currentLang, setCurrentLang] = useState<'UZ' | 'RU' | 'EN'>('UZ'); // Til state qo'shildi
 
   const handleSubmit = async () => {
     if (!data.name || !data.experience || !data.skills) {
@@ -14,10 +15,10 @@ export default function CVBuilder() {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/cv-builder', {
+      const res = await fetch('/api/cv', { // Manzil to'g'irlandi
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, language: currentLang }), // Til qo'shildi
       });
       
       const result = await res.json();
@@ -37,6 +38,19 @@ export default function CVBuilder() {
   return (
     <div className="p-10 max-w-2xl mx-auto bg-slate-900 text-white min-h-screen">
       <h1 className="text-3xl font-bold mb-6">Professional CV Builder</h1>
+
+      {/* Til tanlash tugmalari */}
+      <div className="flex gap-2 mb-6">
+        {(['UZ', 'RU', 'EN'] as const).map((lang) => (
+          <button 
+            key={lang} 
+            onClick={() => setCurrentLang(lang)} 
+            className={`px-4 py-2 rounded font-bold ${currentLang === lang ? 'bg-indigo-600' : 'bg-slate-700'}`}
+          >
+            {lang}
+          </button>
+        ))}
+      </div>
       
       <input 
         className="w-full p-3 mb-4 border border-slate-700 bg-slate-800 rounded text-white" 
