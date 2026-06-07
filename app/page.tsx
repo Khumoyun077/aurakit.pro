@@ -9,7 +9,8 @@ const mainTranslations = {
     card2: 'Mag\'zini chiqarish',
     card3: 'Tarjima qilish',
     card4: 'Professional CV tayyorlash',
-    name: 'Ismingiz', exp: 'Tajriba', skills: 'Ko\'nikmalar', create: 'CV yaratish', back: 'Orqaga'
+    input_placeholder: 'Ma\'lumotni shu yerga kiriting...',
+    create: 'Bajarish', back: 'Orqaga'
   },
   RU: {
     title: 'AuraKit.pro — Всё в 1 клик!',
@@ -18,7 +19,8 @@ const mainTranslations = {
     card2: 'Выделение главного (Конспект)',
     card3: 'Переводчик',
     card4: 'Создание профессионального CV',
-    name: 'Ваше имя', exp: 'Опыт работы', skills: 'Ваши навыки', create: 'Создать CV', back: 'Назад'
+    input_placeholder: 'Введите данные здесь...',
+    create: 'Выполнить', back: 'Назад'
   },
   EN: {
     title: 'AuraKit.pro — All in 1 Click!',
@@ -27,15 +29,16 @@ const mainTranslations = {
     card2: 'Text Summarization',
     card3: 'Translation Service',
     card4: 'Professional CV Builder',
-    name: 'Your Name', exp: 'Your Experience', skills: 'Your Skills', create: 'Create CV', back: 'Back'
+    input_placeholder: 'Enter your data here...',
+    create: 'Execute', back: 'Back'
   }
 };
 
 export default function HomePage() {
   const [currentLang, setCurrentLang] = useState<'UZ' | 'RU' | 'EN'>('UZ');
-  const [showCV, setShowCV] = useState(false);
-  const [data, setData] = useState({ name: '', experience: '', skills: '' });
-  const [cvResult, setCvResult] = useState('');
+  const [activeTab, setActiveTab] = useState<'HOME' | 'AUDIO' | 'SUMMARY' | 'TRANSLATE' | 'CV'>('HOME');
+  const [inputData, setInputData] = useState('');
+  const [result, setResult] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -45,16 +48,19 @@ export default function HomePage() {
 
   const t = mainTranslations[currentLang];
 
-  const handleCreateCV = async () => {
+  const handleAction = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/cv', {
+      // Har bir xizmat uchun alohida API yo'li (avval CV uchun /api/cv bo'lganidek)
+      const endpoint = activeTab === 'CV' ? '/api/cv' : `/api/${activeTab.toLowerCase()}`;
+      
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, language: currentLang }),
+        body: JSON.stringify({ input: inputData, language: currentLang }),
       });
-      const result = await res.json();
-      setCvResult(result.cv);
+      const data = await res.json();
+      setResult(data.result || data.cv);
     } catch (error) {
       console.error("Xatolik:", error);
     }
@@ -63,7 +69,6 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen bg-slate-900 text-white flex flex-col items-center p-6">
-      {/* Til tanlash */}
       <div className="absolute top-6 right-6 flex bg-slate-800 p-1 rounded-xl border border-slate-700/50 z-10">
         {(['UZ', 'RU', 'EN'] as const).map((lang) => (
           <button key={lang} onClick={() => { setCurrentLang(lang); localStorage.setItem('selectedLanguage', lang); }} 
@@ -79,28 +84,29 @@ export default function HomePage() {
       </div>
 
       <div className="w-full max-w-4xl flex flex-col gap-6">
-        {showCV && (
+        {activeTab !== 'HOME' && (
           <div className="bg-slate-800/50 border border-amber-500 p-8 rounded-2xl">
-            <h3 className="text-xl font-bold mb-4">{t.card4}</h3>
-            <input className="w-full p-3 mb-3 bg-slate-900 rounded border border-slate-700" placeholder={t.name} onChange={(e) => setData({...data, name: e.target.value})} />
-            <textarea className="w-full p-3 mb-3 bg-slate-900 rounded border border-slate-700" placeholder={t.exp} onChange={(e) => setData({...data, experience: e.target.value})} />
-            <textarea className="w-full p-3 mb-4 bg-slate-900 rounded border border-slate-700" placeholder={t.skills} onChange={(e) => setData({...data, skills: e.target.value})} />
-            <button onClick={handleCreateCV} className="w-full bg-amber-600 py-3 rounded-xl font-bold hover:bg-amber-700 transition">
+            <h3 className="text-xl font-bold mb-4">
+              {activeTab === 'AUDIO' ? t.card1 : activeTab === 'SUMMARY' ? t.card2 : activeTab === 'TRANSLATE' ? t.card3 : t.card4}
+            </h3>
+            <textarea className="w-full p-4 mb-4 bg-slate-900 rounded border border-slate-700 h-40" 
+                      placeholder={t.input_placeholder} onChange={(e) => setInputData(e.target.value)} />
+            <button onClick={handleAction} className="w-full bg-amber-600 py-3 rounded-xl font-bold hover:bg-amber-700 transition">
               {loading ? '...' : t.create}
             </button>
-            <button onClick={() => setShowCV(false)} className="mt-4 text-slate-400 underline w-full text-center">{t.back}</button>
-            {cvResult && <div className="mt-6 p-4 bg-slate-950 rounded-lg border border-indigo-500 whitespace-pre-line">{cvResult}</div>}
+            <button onClick={() => { setActiveTab('HOME'); setResult(''); }} className="mt-4 text-slate-400 underline w-full text-center">{t.back}</button>
+            {result && <div className="mt-6 p-4 bg-slate-950 rounded-lg border border-indigo-500 whitespace-pre-line">{result}</div>}
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl h-32 flex items-center">🎙️ {t.card1}</div>
-          <div className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl h-32 flex items-center">📄 {t.card2}</div>
-          <div className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl h-32 flex items-center">🌐 {t.card3}</div>
-          <button onClick={() => setShowCV(true)} className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl h-32 text-left hover:border-amber-500 flex items-center transition">
-            💼 {t.card4}
-          </button>
-        </div>
+        {activeTab === 'HOME' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <button onClick={() => setActiveTab('AUDIO')} className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl h-32 text-left hover:border-amber-500 transition">🎙️ {t.card1}</button>
+            <button onClick={() => setActiveTab('SUMMARY')} className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl h-32 text-left hover:border-amber-500 transition">📄 {t.card2}</button>
+            <button onClick={() => setActiveTab('TRANSLATE')} className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl h-32 text-left hover:border-amber-500 transition">🌐 {t.card3}</button>
+            <button onClick={() => setActiveTab('CV')} className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl h-32 text-left hover:border-amber-500 transition">💼 {t.card4}</button>
+          </div>
+        )}
       </div>
     </main>
   );
