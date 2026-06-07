@@ -136,11 +136,11 @@ export default function HomePage() {
         {activeTab === 'HOME' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            {/* ✅ AUDIO — hozircha o'chirilgan */}
+        
             <button onClick={() => setActiveTab('AUDIO')}
-  className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-amber-500 transition text-left">
-  🎙️ {t.card1}
-</button>
+              className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-amber-500 transition text-left">
+              🎙️ {t.card1}
+            </button>
 
             <button onClick={() => setActiveTab('SUMMARY')}
               className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-amber-500 transition text-left">
